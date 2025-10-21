@@ -6,7 +6,12 @@
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
-    "elysia": "latest"
+    "@elysiajs/cors": "^1.4.0",
+    "@elysiajs/openapi": "^1.4.11",
+    "elysia": "latest",
+    "mammoth": "^1.11.0",
+    "pdf-parse": "^2.4.5",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "bun-types": "latest"
