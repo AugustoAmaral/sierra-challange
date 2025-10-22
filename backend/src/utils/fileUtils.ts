@@ -18,7 +18,16 @@ export function generateUniqueFilename(originalName: string): {
   filename: string;
 } {
   const id = uuidv4();
+
+  if (!originalName || originalName.trim() === "")
+    return { id, filename: `file_${id}` };
+
   const lastDotIndex = originalName.lastIndexOf(".");
+
+  if (lastDotIndex === -1) {
+    const filename = `${originalName}${id}`;
+    return { id, filename };
+  }
   const nameWithoutExt = originalName.substring(0, lastDotIndex);
   const ext = originalName.substring(lastDotIndex);
   const filename = `${nameWithoutExt}${id}${ext}`;

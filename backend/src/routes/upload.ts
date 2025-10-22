@@ -57,7 +57,7 @@ export async function handleUpload({
 
       uploadedFiles.push({
         id,
-        originalName: file.name,
+        originalName: file.name || "file",
         filename,
         size: file.size,
         sizeFormatted: formatFileSize(file.size),
@@ -108,7 +108,6 @@ export const handleUploadDocumentation = {
           sizeFormatted: t.String(),
           mimeType: t.String(),
           uploadedAt: t.String(),
-          isSearchable: t.Boolean(),
           url: t.String(),
         })
       ),
