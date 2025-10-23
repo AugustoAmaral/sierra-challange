@@ -1,23 +1,22 @@
-import { describe, expect, it, mock } from "bun:test";
+import { afterAll, describe, expect, it, mock } from "bun:test";
+import {
+  formatFileSize,
+  generateUniqueFilename,
+  extractUUID,
+  getOriginalName,
+  getExtension,
+  extractText,
+} from "./fileUtils";
+import { writeFile } from "fs/promises";
+import { join } from "path";
 
-// Mock dos módulos usando mock.module conforme documentação do Bun
+const TEST_UPLOAD_DIR = join(process.cwd(), "test_uploads");
+async function createTestFile(filename: string, content: string) {
+  await writeFile(join(TEST_UPLOAD_DIR, filename), content);
+}
+
 mock.module("uuid", () => ({
   v4: mock(() => "12345677-1234-1234-1234-1234567890ab"),
-}));
-
-mock.module("fs", () => ({
-  readFileSync: mock((filePath: string, encoding: string) => {
-    if (filePath.includes("test.txt")) {
-      return "Mocked text content from txt file";
-    }
-    if (filePath.includes("test.md")) {
-      return "# Mocked Markdown Content\n\nThis is mocked markdown content.";
-    }
-    if (filePath.includes("error")) {
-      throw new Error("Mocked file read error");
-    }
-    return "Mocked file content";
-  }),
 }));
 
 mock.module("pdf-parse", () => ({
@@ -42,16 +41,11 @@ mock.module("mammoth", () => ({
   },
 }));
 
-import {
-  formatFileSize,
-  generateUniqueFilename,
-  extractUUID,
-  getOriginalName,
-  getExtension,
-  extractText,
-} from "./fileUtils";
-
 describe("fileUtils", () => {
+  afterAll(() => {
+    mock.restore();
+  });
+
   describe("formatFileSize", () => {
     it("should format bytes correctly", () => {
       expect(formatFileSize(0)).toBe("0.00 B");
@@ -472,23 +466,39 @@ describe("fileUtils", () => {
     });
 
     it("should extract text from TXT files using mocked readFileSync", async () => {
-      const result = await extractText("/path/to/test.txt");
+      await createTestFile(
+        "fileaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.txt",
+        "Mocked text content from txt file"
+      );
+      const result = await extractText(
+        join(TEST_UPLOAD_DIR, "fileaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.txt")
+      );
 
       expect(result).toBe("Mocked text content from txt file");
     });
 
     it("should extract text from MD files using mocked readFileSync", async () => {
-      const result = await extractText("/path/to/test.md");
-
-      expect(result).toBe(
-        "# Mocked Markdown Content\n\nThis is mocked markdown content."
+      await createTestFile(
+        "fileaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.md",
+        "Mocked text content from md file"
       );
+      const result = await extractText(
+        join(TEST_UPLOAD_DIR, "fileaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.md")
+      );
+
+      expect(result).toBe("Mocked text content from md file");
     });
 
     it("should handle case insensitive extensions for txt", async () => {
-      const result = await extractText("/path/to/file.TXT");
+      await createTestFile(
+        "fileaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.TXT",
+        "Mocked text content from TXT file"
+      );
+      const result = await extractText(
+        join(TEST_UPLOAD_DIR, "fileaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa.TXT")
+      );
 
-      expect(result).toBe("Mocked file content");
+      expect(result).toBe("Mocked text content from TXT file");
     });
 
     it("should handle case insensitive extensions for pdf", async () => {

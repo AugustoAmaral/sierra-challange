@@ -7,7 +7,10 @@ export const FILE_TYPES = {
   md: "text/markdown",
 } as const;
 
-export const UPLOAD_DIR = join(process.cwd(), "files");
+export const UPLOAD_DIR = join(
+  process.cwd(),
+  process.env.NODE_ENV === "test" ? "test_uploads" : "uploads"
+);
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 export const MAX_FILES = 10;
 export const API_PORT = 3000;

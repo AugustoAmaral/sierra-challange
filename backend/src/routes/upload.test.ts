@@ -8,10 +8,6 @@ mock.module("uuid", () => ({
   v4: mock(() => "12345677-1234-1234-1234-1234567890ac"),
 }));
 
-mock.module("fs/promises", () => ({
-  writeFile: mock(() => Promise.resolve()),
-}));
-
 describe("handleUpload", () => {
   let mockContext: Context;
   let mockSet: { status: number };
@@ -22,10 +18,6 @@ describe("handleUpload", () => {
       body: {},
       set: mockSet,
     } as unknown as Context;
-  });
-
-  afterAll(() => {
-    mock.restore();
   });
 
   describe("Error handling", () => {
