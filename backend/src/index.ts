@@ -5,6 +5,10 @@ import { mkdir } from "fs/promises";
 import { existsSync } from "fs";
 import { UPLOAD_DIR, API_PORT } from "./config/constants";
 import { handleUpload, handleUploadDocumentation } from "./routes/upload";
+import {
+  handleListFiles,
+  handleListFilesDocumentation,
+} from "./routes/listFiles";
 
 // Ensure the upload directory exists
 if (!existsSync(UPLOAD_DIR)) {
@@ -16,6 +20,7 @@ const app = new Elysia()
   .use(openapi({ references: fromTypes() }))
   .get("/", () => "File Upload API")
   .post("/api/upload", handleUpload, handleUploadDocumentation)
+  .get("/api/files", handleListFiles, handleListFilesDocumentation)
   .listen(API_PORT);
 
 console.log(

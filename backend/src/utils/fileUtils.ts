@@ -1,4 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
+import { readFileSync } from "fs";
+import { PDFParse } from "pdf-parse";
+import mammoth from "mammoth";
 
 export function formatFileSize(bytes: number): string {
   const units = ["B", "KB", "MB", "GB"];
@@ -33,4 +36,53 @@ export function generateUniqueFilename(originalName: string): {
   const filename = `${nameWithoutExt}${id}${ext}`;
 
   return { id, filename };
+}
+
+export function extractUUID(filename: string): string {
+  const lastDotIndex = filename.lastIndexOf(".");
+  const nameWithoutExt =
+    lastDotIndex === -1 ? filename : filename.substring(0, lastDotIndex);
+  return nameWithoutExt.slice(-36);
+}
+
+export function getOriginalName(filename: string): string {
+  if (filename.length < 36)
+    throw new Error("Filename is too short to contain a UUID.");
+  const lastDotIndex = filename.lastIndexOf(".");
+  if (lastDotIndex === -1) return filename.slice(0, -36);
+
+  const nameWithoutExt = filename.substring(0, lastDotIndex);
+  return nameWithoutExt.slice(0, -36);
+}
+
+export function getExtension(filename: string): string {
+  const lastDotIndex = filename.lastIndexOf(".");
+  if (lastDotIndex === -1) return "";
+  return filename.substring(lastDotIndex + 1);
+}
+
+export async function extractText(filePath: string): Promise<string> {
+  const extension = getExtension(filePath);
+  try {
+    switch (extension.toLowerCase()) {
+      case "pdf": {
+        const parser = new PDFParse({ url: `file://${filePath}` });
+        const result = await parser.getText();
+        return result.text;
+      }
+      case "docx": {
+        const result = await mammoth.extractRawText({ path: filePath });
+        return result.value;
+      }
+      case "txt":
+      case "md": {
+        return readFileSync(filePath, "utf-8");
+      }
+      default:
+        return "";
+    }
+  } catch (error) {
+    console.error(`Error extracting text from ${filePath}:`, error);
+    return "";
+  }
 }
