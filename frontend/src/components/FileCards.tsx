@@ -9,8 +9,9 @@ import {
   AlertDialogDescription,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@radix-ui/react-alert-dialog";
-import { AlertDialogFooter, AlertDialogHeader } from "./ui/alert-dialog";
+  AlertDialogFooter,
+  AlertDialogHeader,
+} from "./ui/alert-dialog";
 import type { ComponentProps } from "react";
 import Files from "./Files";
 import { formatDateTime, formatFileSize } from "../utils";
@@ -24,54 +25,58 @@ function FileCards({
     <div className="space-y-3">
       {files.map((file) => (
         <Card key={file.id} className="p-4">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-start gap-3 flex-1 min-w-0">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
               <div className="flex-shrink-0 w-10 h-10 rounded bg-slate-100 flex items-center justify-center">
                 <span className="text-xs text-slate-600">
                   {file.extension.toUpperCase()}
                 </span>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="truncate mb-2">{file.name}</p>
-                <div className="flex flex-col gap-1 text-sm text-slate-500">
-                  <div className="flex items-center gap-1">
-                    <HardDrive className="h-3.5 w-3.5" />
-                    <span>{formatFileSize(file.size)}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-3.5 w-3.5" />
-                    <span>{formatDateTime(file.createdAt)}</span>
-                  </div>
-                </div>
+              <p className="truncate flex-1 font-medium">{file.name}</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-sm text-slate-500 pl-[52px]">
+              <div className="flex items-center gap-1">
+                <HardDrive className="h-3.5 w-3.5 flex-shrink-0" />
+                <span className="truncate">{formatFileSize(file.size)}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
+                <span className="truncate">
+                  {formatDateTime(file.createdAt)}
+                </span>
               </div>
             </div>
-            <div className="flex gap-2 flex-shrink-0">
+
+            <div className="flex gap-2 pl-[52px]">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => onDownload(file.id)}
-                className="h-9 w-9 p-0"
+                className="gap-2 flex-1"
               >
                 <Download className="h-4 w-4" />
+                Download
               </Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-9 w-9 p-0">
+                  <Button variant="outline" size="sm" className="gap-2 flex-1">
                     <Trash2 className="h-4 w-4" />
+                    Apagar
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Confirm deletion</AlertDialogTitle>
+                    <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Are you sure you want to delete "{file.name}"? This action
-                      cannot be undone.
+                      Tem certeza que deseja apagar "{file.name}"? Esta ação não
+                      pode ser desfeita.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
                     <AlertDialogAction onClick={() => onDelete(file.id)}>
-                      Delete
+                      Apagar
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
