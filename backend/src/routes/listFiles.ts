@@ -26,14 +26,17 @@ interface ListFilesQuery {
 export async function handleListFiles({
   query,
   set,
-}: Context): Promise<ListFilesResponse | ErrorResponse> {
+}: {
+  query: ListFilesQuery;
+  set: Context["set"];
+}): Promise<ListFilesResponse | ErrorResponse> {
   try {
     const {
       textSearch = "",
       content = false,
       limit = DEFAULT_LIMIT,
       offset = DEFAULT_OFFSET,
-    } = query as ListFilesQuery;
+    } = query;
     const hasFilters = (textSearch && textSearch.trim() !== "") || content;
     let totalSize = 0;
 

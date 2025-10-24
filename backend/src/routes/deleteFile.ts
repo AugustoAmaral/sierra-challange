@@ -1,7 +1,7 @@
 import { t, type Context } from "elysia";
 import { readdirSync, unlinkSync, statSync } from "fs";
 import { join } from "path";
-import type { ErrorResponse } from "../types";
+import type { DeleteFileResponse, ErrorResponse } from "../types";
 import { UPLOAD_DIR } from "../config/constants";
 import {
   extractUUID,
@@ -10,23 +10,15 @@ import {
   formatFileSize,
 } from "../utils/fileUtils";
 
-interface DeleteFileResponse {
-  success: boolean;
-  message: string;
-  deletedFile: {
-    id: string;
-    name: string;
-    size: number;
-    sizeFormatted: string;
-  };
-}
-
 export async function handleDeleteFile({
   params,
   set,
-}: Context): Promise<DeleteFileResponse | ErrorResponse> {
+}: {
+  params: { id: string };
+  set: Context["set"];
+}): Promise<DeleteFileResponse | ErrorResponse> {
   try {
-    const { id } = params as { id: string };
+    const { id } = params;
 
     // Validate UUID format by size
     if (!id || id.length !== 36) {

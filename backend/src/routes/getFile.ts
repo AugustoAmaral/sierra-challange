@@ -1,5 +1,4 @@
 import { t, type Context } from "elysia";
-import type { BunFile } from "bun";
 import { readdirSync } from "fs";
 import { join } from "path";
 import type { ErrorResponse } from "../types";
@@ -9,9 +8,12 @@ import { extractUUID, getOriginalName, getExtension } from "../utils/fileUtils";
 export async function handleGetFile({
   params,
   set,
-}: Context): Promise<BunFile | ErrorResponse> {
+}: {
+  params: { id: string };
+  set: Context["set"];
+}): Promise<File | ErrorResponse> {
   try {
-    const { id } = params as { id: string };
+    const { id } = params;
 
     if (!id || id.length !== 36) {
       set.status = 400;
@@ -46,7 +48,7 @@ export async function handleGetFile({
       "Content-Disposition": `attachment; filename="${originalName}.${extension}"`,
     };
 
-    return file;
+    return file as unknown as File;
   } catch (error) {
     console.error("Get file error:", error);
     set.status = 500;

@@ -8,9 +8,12 @@ import { UPLOAD_DIR, MAX_FILE_SIZE, MAX_FILES } from "../config/constants";
 export async function handleUpload({
   body,
   set,
-}: Context): Promise<UploadResponse | ErrorResponse> {
+}: {
+  body: { files: File | File[] };
+  set: Context["set"];
+}): Promise<UploadResponse | ErrorResponse> {
   try {
-    const files = body.files as File | File[];
+    const files = body.files;
     const fileArray = Array.isArray(files) ? files : [files];
 
     // Verify if files are provided
