@@ -1,22 +1,18 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "../components/ui/button";
-import { Checkbox } from "../components/ui/checkbox";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../components/ui/tooltip";
-import { Progress } from "../components/ui/progress";
-import { Search, Upload, Info } from "lucide-react";
+import { Upload } from "lucide-react";
 import { toast } from "sonner";
 import Files from "../components/Files";
 import getFiles from "../queries/getFiles";
 import uploadFile from "../queries/uploadFile";
 import deleteFile from "../queries/deleteFile";
 import getFile from "../queries/getFile";
+import LoadingWrapper from "../components/LoadingWrapper";
+import Footer from "../components/Footer";
+import EmptyDataHandler from "../components/EmptyDataHandler";
+import useDebounce from "../utils/useDebounce";
+import UploadProgress from "../components/ui/UploadProgress";
+import SearchBar from "../components/SearchBar";
 
 type QueryData = NonNullable<Awaited<ReturnType<typeof getFiles>>>;
 type FileData = NonNullable<QueryData["files"]>;
@@ -41,20 +37,8 @@ function Home() {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    setIsLoading(true);
-    getFiles()
-      .then((data) => {
-        if (data.files) setFiles(data.files);
-        if (data.metadata) setMetadata(data.metadata);
-      })
-      .catch(() => {
-        toast.error("Erro ao buscar arquivos");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, []);
+  const debouncedSearchTerm = useDebounce(searchTerm, 250);
+  const debouncedContentSearch = useDebounce(contentSearch, 250);
 
   const handleUpload = async (uploadedFiles: File[]) => {
     setIsUploading(true);
@@ -124,7 +108,7 @@ function Home() {
           .then((data) => {
             if (data.files) setFiles(data.files);
             if (data.metadata) setMetadata(data.metadata);
-            
+
             if (failureCount === 0) {
               toast.success(
                 `${successCount} arquivo(s) enviado(s) com sucesso!`
@@ -188,6 +172,34 @@ function Home() {
     setIsDragging(false);
   };
 
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteFile(id);
+      setFiles(files?.filter((file) => file.id !== id));
+      toast.success("Arquivo deletado com sucesso!");
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error("Erro ao deletar arquivo");
+    }
+  };
+
+  // Effect for loading the data when search terms change
+  useEffect(() => {
+    setIsLoading(true);
+    getFiles(debouncedSearchTerm, debouncedContentSearch)
+      .then((data) => {
+        if (data.files) setFiles(data.files);
+        if (data.metadata) setMetadata(data.metadata);
+      })
+      .catch(() => {
+        toast.error("Erro ao atualizar a lista de arquivos");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [debouncedSearchTerm, debouncedContentSearch]);
+
+  // Global drag events to allow dropping files anywhere
   useEffect(() => {
     const handleGlobalDragOver = (e: DragEvent) => {
       e.preventDefault();
@@ -206,17 +218,6 @@ function Home() {
       window.removeEventListener("drop", handleGlobalDrop);
     };
   }, []);
-
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteFile(id);
-      setFiles(files?.filter((file) => file.id !== id));
-      toast.success("Arquivo deletado com sucesso!");
-    } catch (error) {
-      console.error("Delete error:", error);
-      toast.error("Erro ao deletar arquivo");
-    }
-  };
 
   return (
     <div
@@ -244,84 +245,12 @@ function Home() {
 
         <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-6">
           <div className="flex gap-4 mb-6">
-            <div className="flex-1 space-y-3">
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input
-                    type="text"
-                    placeholder="Buscar arquivos..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        setIsLoading(true);
-                        getFiles(searchTerm, contentSearch)
-                          .then((data) => {
-                            if (data.files) setFiles(data.files);
-                            if (data.metadata) setMetadata(data.metadata);
-                          })
-                          .catch(() => {
-                            toast.error(
-                              "Erro ao atualizar a lista de arquivos"
-                            );
-                          })
-                          .finally(() => {
-                            setIsLoading(false);
-                          });
-                      }
-                    }}
-                    className="pl-10"
-                  />
-                </div>
-                <Button
-                  onClick={() => {
-                    setIsLoading(true);
-                    getFiles(searchTerm, contentSearch)
-                      .then((data) => {
-                        if (data.files) setFiles(data.files);
-                        if (data.metadata) setMetadata(data.metadata);
-                      })
-                      .catch(() => {
-                        toast.error("Erro ao atualizar a lista de arquivos");
-                      })
-                      .finally(() => {
-                        setIsLoading(false);
-                      });
-                  }}
-                  variant="outline"
-                  className="gap-2"
-                >
-                  <Search className="h-4 w-4" />
-                  Buscar
-                </Button>
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="content-search"
-                  checked={contentSearch}
-                  onCheckedChange={(checked) =>
-                    setContentSearch(checked as boolean)
-                  }
-                />
-                <Label
-                  htmlFor="content-search"
-                  className="cursor-pointer flex items-center gap-1"
-                >
-                  Busca por conteúdo
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Info className="h-3.5 w-3.5 text-slate-400" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Apenas txt, pdf, md e docx</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </Label>
-              </div>
-            </div>
+            <SearchBar
+              searchTerm={searchTerm}
+              onChangeSearchTerm={setSearchTerm}
+              contentSearch={contentSearch}
+              onChangeContentSearch={setContentSearch}
+            />
             <Button
               onClick={() => fileInputRef.current?.click()}
               className="gap-2 self-start"
@@ -337,92 +266,28 @@ function Home() {
               className="hidden"
             />
           </div>
-
-          {isUploading && (
-            <div className="mb-6 space-y-3">
-              <div className="text-sm font-medium text-slate-700 mb-2">
-                Enviando {uploadProgress.length} arquivo
-                {uploadProgress.length !== 1 ? "s" : ""}...
-              </div>
-              {uploadProgress.map((file, index) => (
-                <div key={index} className="space-y-1">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-600 truncate max-w-[70%]">
-                      {file.name}
-                    </span>
-                    <span
-                      className={`font-medium ${
-                        file.status === "completed"
-                          ? "text-green-600"
-                          : file.status === "error"
-                          ? "text-red-600"
-                          : "text-blue-600"
-                      }`}
-                    >
-                      {file.status === "completed"
-                        ? "✓ Concluído"
-                        : file.status === "error"
-                        ? "✗ Erro"
-                        : `${file.progress}%`}
-                    </span>
-                  </div>
-                  <Progress
-                    value={file.progress}
-                    className={
-                      file.status === "error"
-                        ? "[&>div]:bg-red-500"
-                        : file.status === "completed"
-                        ? "[&>div]:bg-green-500"
-                        : ""
-                    }
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-
-          {isLoading ? (
-            <div className="text-center py-12">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
-                <Search className="h-8 w-8 text-slate-400 animate-pulse" />
-              </div>
-              <p className="text-slate-600">Carregando arquivos...</p>
-            </div>
-          ) : files.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
-                <Search className="h-8 w-8 text-slate-400" />
-              </div>
-              <p className="text-slate-600">
-                {searchTerm
-                  ? "Nenhum arquivo encontrado"
-                  : "Nenhum arquivo adicionado ainda"}
-              </p>
-              <p className="text-sm text-slate-500 mt-2">
-                Arraste arquivos ou clique no botão Upload
-              </p>
-            </div>
-          ) : (
-            <Files files={files} onDelete={handleDelete} onDownload={getFile} />
-          )}
+          <UploadProgress
+            isUploading={isUploading}
+            uploadProgress={uploadProgress}
+          />
+          <LoadingWrapper isLoading={isLoading}>
+            <EmptyDataHandler
+              filesLength={files.length}
+              isFilterApplied={contentSearch}
+            >
+              <Files
+                files={files}
+                onDelete={handleDelete}
+                onDownload={getFile}
+              />
+            </EmptyDataHandler>
+          </LoadingWrapper>
         </div>
-
-        <div className="text-center text-sm text-slate-500">
-          {searchTerm ? (
-            <>
-              {files.length} resultado
-              {files.length !== 1 ? "s" : ""} ({metadata?.filteredSizeFormatted}
-              ){" · "}
-              Total: {files.length} arquivo{files.length !== 1 ? "s" : ""} (
-              {metadata?.totalSizeFormatted})
-            </>
-          ) : (
-            <>
-              Total de arquivos: {files.length} · Espaço usado:{" "}
-              {metadata?.totalSizeFormatted}
-            </>
-          )}
-        </div>
+        <Footer
+          filesLength={metadata?.total}
+          filteredSize={metadata?.filteredSizeFormatted}
+          totalSize={metadata?.totalSizeFormatted}
+        />
       </div>
     </div>
   );
