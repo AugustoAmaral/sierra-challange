@@ -28,7 +28,7 @@ export async function handleDeleteFile({
   try {
     const { id } = params as { id: string };
 
-    // Validate UUID format
+    // Validate UUID format by size
     if (!id || id.length !== 36) {
       set.status = 400;
       return {

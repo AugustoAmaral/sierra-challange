@@ -43,7 +43,6 @@ function Home() {
   const handleUpload = async (uploadedFiles: File[]) => {
     setIsUploading(true);
 
-    // Inicializa o progresso para cada arquivo
     const initialProgress: FileUploadProgress[] = uploadedFiles.map((file) => ({
       name: file.name,
       progress: 0,
@@ -52,7 +51,6 @@ function Home() {
     setUploadProgress(initialProgress);
 
     try {
-      // Faz upload de cada arquivo individualmente
       const uploadPromises = uploadedFiles.map(async (file, index) => {
         try {
           const response = await uploadFile(file, {
@@ -68,7 +66,6 @@ function Home() {
             },
           });
 
-          // Marca como concluído
           setUploadProgress((prev) => {
             const newProgress = [...prev];
             newProgress[index] = {
@@ -81,7 +78,6 @@ function Home() {
 
           return response;
         } catch (error) {
-          // Marca como erro
           setUploadProgress((prev) => {
             const newProgress = [...prev];
             newProgress[index] = {

@@ -32,11 +32,8 @@ async function uploadFile(
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     const formData = new FormData();
-
-    // Adiciona o arquivo ao FormData
     formData.append("files", file);
 
-    // Configura o evento de progresso
     if (options?.onProgress) {
       xhr.upload.addEventListener("progress", (e) => {
         if (e.lengthComputable) {
@@ -50,7 +47,6 @@ async function uploadFile(
       });
     }
 
-    // Configura o evento de conclusão
     xhr.addEventListener("load", () => {
       if (xhr.status >= 200 && xhr.status < 300) {
         try {
@@ -69,17 +65,14 @@ async function uploadFile(
       }
     });
 
-    // Configura o evento de erro
     xhr.addEventListener("error", () => {
       reject(new Error("Erro de rede ao fazer upload"));
     });
 
-    // Configura o evento de cancelamento
     xhr.addEventListener("abort", () => {
       reject(new Error("Upload cancelado"));
     });
 
-    // Envia a requisição
     xhr.open("POST", "http://localhost:3000/api/upload");
     xhr.send(formData);
   });

@@ -103,7 +103,6 @@ describe("listFiles route", () => {
       expect(result.success).toBe(true);
       expect(result.files).toHaveLength(3);
 
-      // O arquivo mais recente deve vir primeiro
       const file1Date = new Date(result.files[0].createdAt);
       const file2Date = new Date(result.files[1].createdAt);
       expect(file1Date.getTime()).toBeGreaterThanOrEqual(file2Date.getTime());

@@ -8,7 +8,6 @@ const VALID_UUID = "0542f4c4-192b-4eaa-9857-91e276088878";
 const INVALID_UUID = "invalid-uuid";
 
 describe("DELETE /api/files/:id", () => {
-
   it("should delete a file successfully", async () => {
     const testFilename = `test${VALID_UUID}.txt`;
     const testFilePath = join(UPLOAD_DIR, testFilename);
@@ -64,7 +63,6 @@ describe("DELETE /api/files/:id", () => {
       })
     );
 
-    // Elysia returns 422 for validation errors (schema validation)
     expect(response.status).toBe(422);
   });
 
@@ -75,7 +73,7 @@ describe("DELETE /api/files/:id", () => {
       })
     );
 
-    expect(response.status).toBe(404); // Elysia returns 404 for route not found
+    expect(response.status).toBe(404);
   });
 
   it("should handle file with different extensions", async () => {

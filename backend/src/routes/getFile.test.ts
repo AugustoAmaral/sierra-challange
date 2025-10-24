@@ -46,7 +46,6 @@ describe("GET /api/files/:id", () => {
       new Request(`http://localhost/api/files/${invalidId}`)
     );
 
-    // Elysia returns 422 for validation errors (schema validation)
     expect(response.status).toBe(422);
   });
 
@@ -79,8 +78,7 @@ describe("GET /api/files/:id", () => {
     );
 
     expect(response.status).toBe(200);
-    
-    // Verify content size through the actual content
+
     const content = await response.text();
     expect(content.length).toBe(testContent.length);
     expect(content).toBe(testContent);

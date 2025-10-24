@@ -95,7 +95,6 @@ export async function handleListFiles({
       );
     }
 
-    // Calculate filtered metadata
     let filteredCount = null,
       filteredSize = null;
     if (hasFilters) {
@@ -103,7 +102,6 @@ export async function handleListFiles({
       filteredSize = filteredFiles.reduce((sum, file) => sum + file.size, 0);
     }
 
-    // Apply pagination
     const paginatedFiles = filteredFiles.slice(offset, offset + limit);
 
     return {
