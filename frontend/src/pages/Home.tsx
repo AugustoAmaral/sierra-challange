@@ -22,6 +22,12 @@ type QueryData = NonNullable<Awaited<ReturnType<typeof getFiles>>>;
 type FileData = NonNullable<QueryData["files"]>;
 type Metadata = QueryData["metadata"];
 
+type FileUploadProgress = {
+  name: string;
+  progress: number;
+  status: "uploading" | "completed" | "error";
+};
+
 function Home() {
   const [files, setFiles] = useState<FileData>([]);
   const [metadata, setMetadata] = useState<Metadata | null>(null);
@@ -29,7 +35,9 @@ function Home() {
   const [contentSearch, setContentSearch] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadProgress, setUploadProgress] = useState<FileUploadProgress[]>(
+    []
+  );
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -50,21 +58,82 @@ function Home() {
 
   const handleUpload = async (uploadedFiles: File[]) => {
     setIsUploading(true);
-    setUploadProgress(0);
+
+    // Inicializa o progresso para cada arquivo
+    const initialProgress: FileUploadProgress[] = uploadedFiles.map((file) => ({
+      name: file.name,
+      progress: 0,
+      status: "uploading" as const,
+    }));
+    setUploadProgress(initialProgress);
 
     try {
-      const response = await uploadFile(uploadedFiles);
-      setUploadProgress(100);
+      // Faz upload de cada arquivo individualmente
+      const uploadPromises = uploadedFiles.map(async (file, index) => {
+        try {
+          const response = await uploadFile(file, {
+            onProgress: (progress) => {
+              setUploadProgress((prev) => {
+                const newProgress = [...prev];
+                newProgress[index] = {
+                  ...newProgress[index],
+                  progress: progress.percentage,
+                };
+                return newProgress;
+              });
+            },
+          });
 
-      if (response.data?.success) {
+          // Marca como concluído
+          setUploadProgress((prev) => {
+            const newProgress = [...prev];
+            newProgress[index] = {
+              ...newProgress[index],
+              progress: 100,
+              status: "completed",
+            };
+            return newProgress;
+          });
+
+          return response;
+        } catch (error) {
+          // Marca como erro
+          setUploadProgress((prev) => {
+            const newProgress = [...prev];
+            newProgress[index] = {
+              ...newProgress[index],
+              status: "error",
+            };
+            return newProgress;
+          });
+          throw error;
+        }
+      });
+
+      const results = await Promise.allSettled(uploadPromises);
+      const successCount = results.filter(
+        (r) => r.status === "fulfilled"
+      ).length;
+      const failureCount = results.filter(
+        (r) => r.status === "rejected"
+      ).length;
+
+      if (successCount > 0) {
         setIsLoading(true);
         getFiles(searchTerm, contentSearch)
           .then((data) => {
             if (data.files) setFiles(data.files);
             if (data.metadata) setMetadata(data.metadata);
-            toast.success(
-              `${uploadedFiles.length} arquivo(s) enviado(s) com sucesso!`
-            );
+            
+            if (failureCount === 0) {
+              toast.success(
+                `${successCount} arquivo(s) enviado(s) com sucesso!`
+              );
+            } else {
+              toast.warning(
+                `${successCount} arquivo(s) enviado(s) com sucesso, ${failureCount} falharam`
+              );
+            }
           })
           .catch(() => {
             toast.error("Erro ao atualizar a lista de arquivos");
@@ -81,8 +150,8 @@ function Home() {
     } finally {
       setTimeout(() => {
         setIsUploading(false);
-        setUploadProgress(0);
-      }, 500);
+        setUploadProgress([]);
+      }, 2000);
     }
   };
 
@@ -270,12 +339,45 @@ function Home() {
           </div>
 
           {isUploading && (
-            <div className="mb-6 space-y-2">
-              <div className="flex justify-between text-sm text-slate-600">
-                <span>Enviando arquivos...</span>
-                <span>{uploadProgress}%</span>
+            <div className="mb-6 space-y-3">
+              <div className="text-sm font-medium text-slate-700 mb-2">
+                Enviando {uploadProgress.length} arquivo
+                {uploadProgress.length !== 1 ? "s" : ""}...
               </div>
-              <Progress value={uploadProgress} />
+              {uploadProgress.map((file, index) => (
+                <div key={index} className="space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-600 truncate max-w-[70%]">
+                      {file.name}
+                    </span>
+                    <span
+                      className={`font-medium ${
+                        file.status === "completed"
+                          ? "text-green-600"
+                          : file.status === "error"
+                          ? "text-red-600"
+                          : "text-blue-600"
+                      }`}
+                    >
+                      {file.status === "completed"
+                        ? "✓ Concluído"
+                        : file.status === "error"
+                        ? "✗ Erro"
+                        : `${file.progress}%`}
+                    </span>
+                  </div>
+                  <Progress
+                    value={file.progress}
+                    className={
+                      file.status === "error"
+                        ? "[&>div]:bg-red-500"
+                        : file.status === "completed"
+                        ? "[&>div]:bg-green-500"
+                        : ""
+                    }
+                  />
+                </div>
+              ))}
             </div>
           )}
 
