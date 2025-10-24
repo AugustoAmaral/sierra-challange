@@ -26,8 +26,8 @@ export async function createApp() {
     .get("/", () => "File Upload API")
     .post("/api/upload", handleUpload, handleUploadDocumentation)
     .get("/api/files", handleListFiles, handleListFilesDocumentation)
-    .get("/api/files/:id", handleGetFile, handleGetFileDocumentation)
-    .delete("/api/files/:id", handleDeleteFile, handleDeleteFileDocumentation);
+    .get("/api/file/:id", handleGetFile, handleGetFileDocumentation)
+    .delete("/api/file/:id", handleDeleteFile, handleDeleteFileDocumentation);
 
   return app;
 }

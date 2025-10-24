@@ -9,7 +9,7 @@ export const FILE_TYPES = {
 
 export const UPLOAD_DIR = join(
   process.cwd(),
-  process.env.NODE_ENV === "test" ? "test_uploads" : "uploads"
+  process.env.NODE_ENV === "test" ? "test_uploads" : "files"
 );
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 export const MAX_FILES = 10;
