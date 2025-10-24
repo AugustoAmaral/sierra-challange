@@ -13,7 +13,7 @@ export const UPLOAD_DIR = join(
 );
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 export const MAX_FILES = 10;
-export const API_PORT = 3000;
+export const API_PORT = process.env.NODE_ENV === "test" ? 3001 : 3000;
 export const SEARCHABLE_EXTENSIONS = Object.keys(FILE_TYPES);
 export const DEFAULT_LIMIT = 20;
 export const DEFAULT_OFFSET = 0;
