@@ -28,7 +28,7 @@ function FileCards({
             <div className="flex items-start gap-3 flex-1 min-w-0">
               <div className="flex-shrink-0 w-10 h-10 rounded bg-slate-100 flex items-center justify-center">
                 <span className="text-xs text-slate-600">
-                  {file.name.split(".").pop()?.toUpperCase()}
+                  {file.extension.toUpperCase()}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
@@ -40,7 +40,7 @@ function FileCards({
                   </div>
                   <div className="flex items-center gap-1">
                     <Calendar className="h-3.5 w-3.5" />
-                    <span>{formatDateTime(file.addedAt)}</span>
+                    <span>{formatDateTime(file.createdAt)}</span>
                   </div>
                 </div>
               </div>
@@ -49,7 +49,7 @@ function FileCards({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => onDownload(file)}
+                onClick={() => onDownload(file.id)}
                 className="h-9 w-9 p-0"
               >
                 <Download className="h-4 w-4" />

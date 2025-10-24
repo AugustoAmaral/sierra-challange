@@ -46,20 +46,20 @@ export function FileTable({
                 <div className="flex items-center gap-2">
                   <div className="flex-shrink-0 w-8 h-8 rounded bg-slate-100 flex items-center justify-center">
                     <span className="text-xs text-slate-600">
-                      {file.name.split(".").pop()?.toUpperCase()}
+                      {file.extension.toUpperCase()}
                     </span>
                   </div>
                   <span className="truncate">{file.name}</span>
                 </div>
               </TableCell>
               <TableCell>{formatFileSize(file.size)}</TableCell>
-              <TableCell>{formatDateTime(file.addedAt)}</TableCell>
+              <TableCell>{formatDateTime(file.createdAt)}</TableCell>
               <TableCell className="text-right">
                 <div className="flex gap-2 justify-end">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => onDownload(file)}
+                    onClick={() => onDownload(file.id)}
                     className="gap-1"
                   >
                     <Download className="h-4 w-4" />
