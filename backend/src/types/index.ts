@@ -48,7 +48,7 @@ export interface ListFilesResponse {
 }
 
 export interface DeleteFileResponse {
-  success: boolean;
+  success: true;
   message: string;
   deletedFile: {
     id: string;

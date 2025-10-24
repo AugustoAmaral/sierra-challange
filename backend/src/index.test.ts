@@ -400,8 +400,8 @@ describe("Application Integration Tests", () => {
       const data = (await response.json()) as any;
       const url = data.files[0].url;
 
-      expect(url).toStartWith("/api/files/");
-      expect(url.split("/").length).toBe(4); // /, api, files, {id}
+      expect(url).toStartWith("/api/file/");
+      expect(url.split("/").length).toBe(4); // /, api, file, {id}
     });
   });
 

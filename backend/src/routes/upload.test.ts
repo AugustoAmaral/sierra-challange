@@ -115,7 +115,7 @@ describe("handleUpload", () => {
       expect(result.files[0].filename).toEndWith(".txt");
       expect(result.files[0].sizeFormatted).toBeTruthy();
       expect(result.files[0].uploadedAt).toBeTruthy();
-      expect(result.files[0].url).toStartWith("/api/files/");
+      expect(result.files[0].url).toStartWith("/api/file/");
     });
 
     it("should successfully upload multiple files", async () => {
@@ -152,7 +152,7 @@ describe("handleUpload", () => {
         expect(file.size).toBe(files[index].size);
         expect(file.mimeType).toBe(files[index].type);
         expect(file.id).toBeTruthy();
-        expect(file.url).toStartWith("/api/files/");
+        expect(file.url).toStartWith("/api/file/");
       });
     });
 

@@ -66,7 +66,7 @@ export async function handleUpload({
         sizeFormatted: formatFileSize(file.size),
         mimeType: file.type,
         uploadedAt: new Date().toISOString(),
-        url: `/api/files/${id}`,
+        url: `/api/file/${id}`,
       });
     }
 

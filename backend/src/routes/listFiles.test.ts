@@ -84,7 +84,7 @@ describe("listFiles route", () => {
         name: "notes",
         size: 31,
         sizeFormatted: "31.00 B",
-        url: "/api/files/notes12345678-1234-4123-8123-123456789012.md",
+        url: "/api/file/12345678-1234-4123-8123-123456789012",
       });
       expect(file.createdAt).toMatch(
         /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
@@ -332,7 +332,7 @@ describe("listFiles route", () => {
 
       expect(result.success).toBe(true);
       expect(result.files[0].url).toBe(
-        "/api/files/test550e8400-e29b-41d4-a716-446655440000.PDF"
+        "/api/file/550e8400-e29b-41d4-a716-446655440000"
       );
     });
   });
