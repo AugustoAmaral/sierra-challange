@@ -46,3 +46,14 @@ export interface ListFilesResponse {
     offset: number;
   };
 }
+
+export interface DeleteFileResponse {
+  success: boolean;
+  message: string;
+  deletedFile: {
+    id: string;
+    name: string;
+    size: number;
+    sizeFormatted: string;
+  };
+}

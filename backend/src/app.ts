@@ -8,6 +8,10 @@ import {
   handleListFilesDocumentation,
 } from "./routes/listFiles";
 import { handleGetFile, handleGetFileDocumentation } from "./routes/getFile";
+import {
+  handleDeleteFile,
+  handleDeleteFileDocumentation,
+} from "./routes/deleteFile";
 
 /**
  * Creates and configures the Elysia application instance
@@ -22,7 +26,8 @@ export async function createApp() {
     .get("/", () => "File Upload API")
     .post("/api/upload", handleUpload, handleUploadDocumentation)
     .get("/api/files", handleListFiles, handleListFilesDocumentation)
-    .get("/api/files/:id", handleGetFile, handleGetFileDocumentation);
+    .get("/api/files/:id", handleGetFile, handleGetFileDocumentation)
+    .delete("/api/files/:id", handleDeleteFile, handleDeleteFileDocumentation);
 
   return app;
 }
