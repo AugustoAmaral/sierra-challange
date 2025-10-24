@@ -15,7 +15,7 @@ describe("DELETE /api/files/:id", () => {
     writeFileSync(testFilePath, testContent);
 
     const response = await testApp.handle(
-      new Request(`http://localhost/api/files/${VALID_UUID}`, {
+      new Request(`http://localhost/api/file/${VALID_UUID}`, {
         method: "DELETE",
       })
     );
@@ -41,7 +41,7 @@ describe("DELETE /api/files/:id", () => {
     const nonExistentUUID = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
 
     const response = await testApp.handle(
-      new Request(`http://localhost/api/files/${nonExistentUUID}`, {
+      new Request(`http://localhost/api/file/${nonExistentUUID}`, {
         method: "DELETE",
       })
     );
@@ -58,7 +58,7 @@ describe("DELETE /api/files/:id", () => {
 
   it("should return 400 for invalid UUID format", async () => {
     const response = await testApp.handle(
-      new Request(`http://localhost/api/files/${INVALID_UUID}`, {
+      new Request(`http://localhost/api/file/${INVALID_UUID}`, {
         method: "DELETE",
       })
     );
@@ -68,7 +68,7 @@ describe("DELETE /api/files/:id", () => {
 
   it("should return 404 for empty UUID", async () => {
     const response = await testApp.handle(
-      new Request("http://localhost/api/files/", {
+      new Request("http://localhost/api/file/", {
         method: "DELETE",
       })
     );
@@ -83,7 +83,7 @@ describe("DELETE /api/files/:id", () => {
     writeFileSync(testFilePath, "PDF content");
 
     const response = await testApp.handle(
-      new Request(`http://localhost/api/files/${pdfUUID}`, {
+      new Request(`http://localhost/api/file/${pdfUUID}`, {
         method: "DELETE",
       })
     );
@@ -102,7 +102,7 @@ describe("DELETE /api/files/:id", () => {
     writeFileSync(testFilePath, "No extension content");
 
     const response = await testApp.handle(
-      new Request(`http://localhost/api/files/${noExtUUID}`, {
+      new Request(`http://localhost/api/file/${noExtUUID}`, {
         method: "DELETE",
       })
     );
@@ -122,7 +122,7 @@ describe("DELETE /api/files/:id", () => {
     writeFileSync(testFilePath, testContent);
 
     const response = await testApp.handle(
-      new Request(`http://localhost/api/files/${sizeTestUUID}`, {
+      new Request(`http://localhost/api/file/${sizeTestUUID}`, {
         method: "DELETE",
       })
     );

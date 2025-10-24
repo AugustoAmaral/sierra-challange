@@ -14,7 +14,7 @@ describe("GET /api/files/:id", () => {
     writeFileSync(testFilePath, testContent);
 
     const response = await testApp.handle(
-      new Request(`http://localhost/api/files/${testFileId}`)
+      new Request(`http://localhost/api/file/${testFileId}`)
     );
 
     expect(response.status).toBe(200);
@@ -30,7 +30,7 @@ describe("GET /api/files/:id", () => {
   it("should return 404 for non-existent file", async () => {
     const fakeId = "00000000-0000-0000-0000-000000000000";
     const response = await testApp.handle(
-      new Request(`http://localhost/api/files/${fakeId}`)
+      new Request(`http://localhost/api/file/${fakeId}`)
     );
 
     expect(response.status).toBe(404);
@@ -43,7 +43,7 @@ describe("GET /api/files/:id", () => {
   it("should return 400 for invalid UUID format", async () => {
     const invalidId = "invalid-uuid";
     const response = await testApp.handle(
-      new Request(`http://localhost/api/files/${invalidId}`)
+      new Request(`http://localhost/api/file/${invalidId}`)
     );
 
     expect(response.status).toBe(422);
@@ -57,7 +57,7 @@ describe("GET /api/files/:id", () => {
     writeFileSync(txtFilePath, "Text content");
 
     const txtResponse = await testApp.handle(
-      new Request(`http://localhost/api/files/${txtId}`)
+      new Request(`http://localhost/api/file/${txtId}`)
     );
     expect(txtResponse.status).toBe(200);
     expect(txtResponse.headers.get("Content-Type")).toContain("text/plain");
@@ -74,7 +74,7 @@ describe("GET /api/files/:id", () => {
     writeFileSync(testFilePath, testContent);
 
     const response = await testApp.handle(
-      new Request(`http://localhost/api/files/${testFileId}`)
+      new Request(`http://localhost/api/file/${testFileId}`)
     );
 
     expect(response.status).toBe(200);

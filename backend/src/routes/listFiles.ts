@@ -111,7 +111,7 @@ export async function handleListFiles({
       success: true,
       files: paginatedFiles.map(({ filePath, ...item }) => ({
         ...item,
-        url: `/api/files/${item.name}${item.id}.${item.extension}`,
+        url: `/api/file/${item.id}`,
       })),
       metadata: {
         total: totalFiles,
