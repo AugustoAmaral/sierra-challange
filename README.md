@@ -133,7 +133,6 @@ After completing the API, I integrated the frontend using **Eden Treaty** for ty
 - **Build Tool**: Vite with Rolldown
 - **Styling**: Tailwind CSS v4.1.3
 - **Components**: Radix UI for accessibility
-- **State Management**: React Query for async operations
 
 ## 🚀 Running the Project
 
